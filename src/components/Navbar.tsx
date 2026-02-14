@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { Flame, Menu, X } from "lucide-react";
+import { Flame, Menu, X, LogIn, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 const navLinks = [
   { label: "Home", href: "#home" },
@@ -12,6 +14,8 @@ const navLinks = [
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { user, signOut, loading } = useAuth();
+  const navigate = useNavigate();
 
   const scrollTo = (href: string) => {
     const el = document.querySelector(href);
@@ -39,9 +43,23 @@ const Navbar = () => {
               {link.label}
             </button>
           ))}
-          <Button onClick={() => scrollTo("#dashboard")} className="fire-gradient-bg border-0 font-display text-sm uppercase tracking-wider fire-glow hover:scale-105 transition-transform">
-            Try Now
-          </Button>
+          {!loading && (
+            user ? (
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-muted-foreground font-body flex items-center gap-1">
+                  <User className="w-4 h-4" />
+                  {user.user_metadata?.full_name || user.email?.split("@")[0]}
+                </span>
+                <Button onClick={signOut} variant="outline" size="sm" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground font-display text-xs uppercase tracking-wider">
+                  <LogOut className="w-3 h-3 mr-1" /> Sign Out
+                </Button>
+              </div>
+            ) : (
+              <Button onClick={() => navigate("/auth")} className="fire-gradient-bg border-0 font-display text-sm uppercase tracking-wider fire-glow hover:scale-105 transition-transform">
+                <LogIn className="w-4 h-4 mr-1" /> Sign In
+              </Button>
+            )
+          )}
         </div>
 
         {/* Mobile toggle */}
@@ -58,9 +76,23 @@ const Navbar = () => {
               {link.label}
             </button>
           ))}
-          <Button onClick={() => scrollTo("#dashboard")} className="w-full fire-gradient-bg border-0 font-display">
-            Try Now
-          </Button>
+          {!loading && (
+            user ? (
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground font-body flex items-center gap-1">
+                  <User className="w-4 h-4" />
+                  {user.user_metadata?.full_name || user.email?.split("@")[0]}
+                </p>
+                <Button onClick={signOut} variant="outline" className="w-full border-primary text-primary font-display">
+                  <LogOut className="w-4 h-4 mr-1" /> Sign Out
+                </Button>
+              </div>
+            ) : (
+              <Button onClick={() => { navigate("/auth"); setMobileOpen(false); }} className="w-full fire-gradient-bg border-0 font-display">
+                <LogIn className="w-4 h-4 mr-1" /> Sign In
+              </Button>
+            )
+          )}
         </div>
       )}
     </nav>
