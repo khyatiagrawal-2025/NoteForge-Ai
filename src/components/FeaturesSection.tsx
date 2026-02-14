@@ -62,8 +62,8 @@ const FeatureCard = ({ feature, index }: { feature: typeof features[0]; index: n
       <div
         className={`relative rounded-2xl p-8 transition-all duration-500 ${
           hovered
-            ? "bg-gradient-to-br from-primary/30 via-accent/20 to-secondary/20 -translate-y-2"
-            : "bg-card"
+            ? "bg-gradient-to-br from-primary/30 via-accent/20 to-secondary/20 -translate-y-3 shadow-[0_20px_60px_hsl(var(--primary)/0.35)]"
+            : "bg-card shadow-[0_4px_20px_hsl(var(--primary)/0.08)]"
         }`}
       >
         {/* Icon */}
@@ -96,12 +96,21 @@ const FeatureCard = ({ feature, index }: { feature: typeof features[0]; index: n
 const FeaturesSection = () => (
   <section id="features" className="py-24 px-6 max-w-7xl mx-auto relative z-10">
     <motion.h2
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, y: 30, scale: 0.95 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true }}
-      className="text-4xl md:text-5xl font-black text-center fire-gradient-text mb-4"
+      transition={{ duration: 0.6, type: "spring", stiffness: 100 }}
+      className="text-4xl md:text-5xl font-black text-center fire-gradient-text mb-4 relative"
     >
       POWERFUL FEATURES
+      <motion.div
+        className="absolute -bottom-2 left-1/2 h-[3px] rounded-full"
+        style={{ background: "linear-gradient(90deg, transparent, hsl(var(--primary)), hsl(var(--accent)), hsl(var(--primary)), transparent)" }}
+        initial={{ width: 0, x: "-50%" }}
+        whileInView={{ width: "60%", x: "-50%" }}
+        viewport={{ once: true }}
+        transition={{ delay: 0.4, duration: 0.8, ease: "easeOut" }}
+      />
     </motion.h2>
     <motion.p
       initial={{ opacity: 0 }}

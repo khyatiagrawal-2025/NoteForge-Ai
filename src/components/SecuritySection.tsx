@@ -36,7 +36,7 @@ const SecurityCard = ({ item, index }: { item: typeof items[0]; index: number })
         />
       </div>
 
-      <div className={`relative bg-card p-6 rounded-2xl text-center transition-all duration-500 ${hovered ? "-translate-y-2 shadow-[0_20px_50px_hsl(var(--primary)/0.3)]" : ""}`}>
+      <div className={`relative bg-card p-6 rounded-2xl text-center transition-all duration-500 ${hovered ? "-translate-y-3 shadow-[0_25px_60px_hsl(var(--primary)/0.35)]" : "shadow-[0_4px_15px_hsl(var(--primary)/0.08)]"}`}>
         {/* Sparkle particles */}
         {hovered && (
           <>
@@ -107,7 +107,23 @@ const SecuritySection = () => (
             <span className="font-body text-sm text-primary font-semibold">Trusted by 10,000+ teams</span>
           </motion.div>
 
-          <h2 className="text-4xl md:text-5xl font-black fire-gradient-text mb-4">ENTERPRISE-GRADE SECURITY</h2>
+          <motion.h2
+            initial={{ opacity: 0, y: 30, scale: 0.95 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, type: "spring", stiffness: 100 }}
+            className="text-4xl md:text-5xl font-black fire-gradient-text mb-4 relative inline-block"
+          >
+            ENTERPRISE-GRADE SECURITY
+            <motion.div
+              className="absolute -bottom-2 left-0 right-0 h-[3px] rounded-full mx-auto"
+              style={{ background: "linear-gradient(90deg, transparent, hsl(var(--primary)), hsl(var(--accent)), hsl(var(--primary)), transparent)" }}
+              initial={{ scaleX: 0 }}
+              whileInView={{ scaleX: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.4, duration: 0.8, ease: "easeOut" }}
+            />
+          </motion.h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto font-body">
             Your data is protected with military-grade encryption and zero-knowledge architecture
           </p>
