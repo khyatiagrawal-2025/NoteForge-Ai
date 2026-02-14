@@ -1,6 +1,6 @@
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useTransform } from "framer-motion";
 import { Lock, Award, ShieldCheck, UserX, Fingerprint, KeyRound } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 const items = [
   { icon: Lock, title: "AES-256 Encryption", desc: "Bank-level encryption for all your data at rest and in transit." },
@@ -13,15 +13,37 @@ const items = [
 
 const SecurityCard = ({ item, index }: { item: typeof items[0]; index: number }) => {
   const [hovered, setHovered] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    setTilt({ x: y * -8, y: x * 8 });
+  };
+
+  const handleMouseLeave = () => {
+    setHovered(false);
+    setTilt({ x: 0, y: 0 });
+  };
 
   return (
     <motion.div
+      ref={cardRef}
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ delay: index * 0.1 }}
       onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      animate={{
+        rotateX: tilt.x,
+        rotateY: tilt.y,
+      }}
+      style={{ perspective: 800, transformStyle: "preserve-3d" }}
       className="relative cursor-pointer"
     >
       {/* Rotating gradient border */}
@@ -36,51 +58,85 @@ const SecurityCard = ({ item, index }: { item: typeof items[0]; index: number })
         />
       </div>
 
-      <div className={`relative bg-card p-6 rounded-2xl text-center transition-all duration-500 ${hovered ? "-translate-y-2 shadow-[0_20px_50px_hsl(var(--primary)/0.3)]" : ""}`}>
+      <motion.div
+        className="relative bg-card p-6 rounded-2xl text-center transition-colors duration-500"
+        animate={
+          hovered
+            ? {
+                y: -6,
+                boxShadow: "0 25px 60px -10px hsl(var(--primary) / 0.35), 0 10px 20px -5px hsl(var(--primary) / 0.15)",
+              }
+            : {
+                y: 0,
+                boxShadow: "0 4px 12px 0px hsl(var(--primary) / 0.08)",
+              }
+        }
+        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+      >
         {/* Sparkle particles */}
         {hovered && (
           <>
-            {[...Array(4)].map((_, i) => (
+            {[...Array(5)].map((_, i) => (
               <motion.div
                 key={i}
                 className="absolute w-1 h-1 rounded-full bg-primary"
                 initial={{ x: "50%", y: "50%", opacity: 0, scale: 0 }}
                 animate={{
-                  x: `${15 + Math.random() * 70}%`,
-                  y: `${10 + Math.random() * 80}%`,
+                  x: `${10 + Math.random() * 80}%`,
+                  y: `${5 + Math.random() * 90}%`,
                   opacity: [0, 1, 0],
-                  scale: [0, 1.5, 0],
+                  scale: [0, 2, 0],
                 }}
-                transition={{ duration: 0.8, delay: i * 0.12, repeat: Infinity, repeatDelay: 0.6 }}
+                transition={{ duration: 0.9, delay: i * 0.1, repeat: Infinity, repeatDelay: 0.4 }}
               />
             ))}
           </>
         )}
 
-        {/* Shield pulse ring behind icon */}
+        {/* Shield pulse rings behind icon */}
         <div className="relative mx-auto w-16 h-16 mb-4 flex items-center justify-center">
           <motion.div
             className="absolute inset-0 rounded-full border-2 border-primary/30"
-            animate={hovered ? { scale: [1, 1.5, 1], opacity: [0.5, 0, 0.5] } : { scale: 1, opacity: 0 }}
+            animate={hovered ? { scale: [1, 1.6, 1], opacity: [0.6, 0, 0.6] } : { scale: 1, opacity: 0 }}
             transition={{ duration: 1.5, repeat: Infinity }}
           />
-          <motion.div animate={hovered ? { scale: 1.15, rotate: [0, -5, 5, 0] } : { scale: 1, rotate: 0 }} transition={{ duration: 0.4 }}>
-            <item.icon className="w-12 h-12 text-primary" />
+          <motion.div
+            className="absolute inset-1 rounded-full border border-primary/20"
+            animate={hovered ? { scale: [1, 1.3, 1], opacity: [0.4, 0, 0.4] } : { scale: 1, opacity: 0 }}
+            transition={{ duration: 1.5, repeat: Infinity, delay: 0.3 }}
+          />
+          <motion.div
+            animate={hovered ? { scale: 1.2, rotate: [0, -8, 8, 0] } : { scale: 1, rotate: 0 }}
+            transition={{ duration: 0.5, type: "spring" }}
+          >
+            <item.icon className="w-12 h-12 text-primary drop-shadow-[0_0_8px_hsl(var(--primary)/0.4)]" />
           </motion.div>
         </div>
 
-        <h4 className="font-display text-lg font-bold mb-2 text-foreground">{item.title}</h4>
-        <p className="text-muted-foreground font-body text-sm">{item.desc}</p>
+        <motion.h4
+          className="font-display text-lg font-bold mb-2 text-foreground"
+          animate={hovered ? { letterSpacing: "0.02em", scale: 1.03 } : { letterSpacing: "0em", scale: 1 }}
+          transition={{ duration: 0.3 }}
+        >
+          {item.title}
+        </motion.h4>
+        <motion.p
+          className="text-muted-foreground font-body text-sm"
+          animate={hovered ? { opacity: 1, y: 0 } : { opacity: 0.8, y: 2 }}
+          transition={{ duration: 0.3 }}
+        >
+          {item.desc}
+        </motion.p>
 
         {/* Bottom glow line */}
         <motion.div
-          className="absolute bottom-0 left-[15%] right-[15%] h-[2px] rounded-full"
-          style={{ background: "linear-gradient(90deg, transparent, hsl(var(--primary)), transparent)" }}
+          className="absolute bottom-0 left-[10%] right-[10%] h-[2px] rounded-full"
+          style={{ background: "linear-gradient(90deg, transparent, hsl(var(--primary)), hsl(var(--accent)), transparent)" }}
           initial={{ scaleX: 0, opacity: 0 }}
           animate={hovered ? { scaleX: 1, opacity: 1 } : { scaleX: 0, opacity: 0 }}
           transition={{ duration: 0.4 }}
         />
-      </div>
+      </motion.div>
     </motion.div>
   );
 };
@@ -107,10 +163,24 @@ const SecuritySection = () => (
             <span className="font-body text-sm text-primary font-semibold">Trusted by 10,000+ teams</span>
           </motion.div>
 
-          <h2 className="text-4xl md:text-5xl font-black fire-gradient-text mb-4">ENTERPRISE-GRADE SECURITY</h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto font-body">
+          <motion.h2
+            className="text-4xl md:text-5xl font-black fire-gradient-text mb-4"
+            initial={{ opacity: 0, y: 20, letterSpacing: "-0.02em" }}
+            whileInView={{ opacity: 1, y: 0, letterSpacing: "0.02em" }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+          >
+            ENTERPRISE-GRADE SECURITY
+          </motion.h2>
+          <motion.p
+            className="text-muted-foreground text-lg max-w-2xl mx-auto font-body"
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3, duration: 0.6 }}
+          >
             Your data is protected with military-grade encryption and zero-knowledge architecture
-          </p>
+          </motion.p>
         </motion.div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
