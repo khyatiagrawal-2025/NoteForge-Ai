@@ -1,45 +1,124 @@
 import { motion } from "framer-motion";
-import { Brain, Shield, Zap } from "lucide-react";
+import { Brain, Shield, Zap, Mic, Users, TrendingUp, Cloud } from "lucide-react";
+import { useState } from "react";
 
 const features = [
   {
+    icon: Mic,
+    title: "Real-Time Transcription",
+    desc: "98% accuracy across 100+ languages with live transcription and speaker identification.",
+  },
+  {
     icon: Brain,
     title: "AI Analysis",
-    desc: "Advanced AI automatically extracts action items, decisions, and insights with high accuracy.",
+    desc: "Advanced AI extracts action items, decisions, and insights automatically.",
+    highlight: true,
   },
   {
     icon: Shield,
-    title: "Secure & Private",
-    desc: "Your data is encrypted and processed securely. We never share your information.",
+    title: "Enterprise Security",
+    desc: "End-to-end encryption, SOC 2 compliant, GDPR ready with zero-knowledge architecture.",
   },
   {
-    icon: Zap,
-    title: "Lightning Fast",
-    desc: "Get results in seconds with our optimized AI processing pipeline.",
+    icon: Users,
+    title: "Collaboration",
+    desc: "Real-time collaboration with team members, shared notes, and role-based access.",
+  },
+  {
+    icon: TrendingUp,
+    title: "Smart Analytics",
+    desc: "Track meeting trends, productivity metrics, and team performance over time.",
+  },
+  {
+    icon: Cloud,
+    title: "Cloud Sync",
+    desc: "Seamless sync across all devices with automatic backups and version history.",
   },
 ];
 
+const FeatureCard = ({ feature, index }: { feature: typeof features[0]; index: number }) => {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay: index * 0.1, duration: 0.5 }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="relative group cursor-pointer"
+    >
+      {/* Outer glow border on hover */}
+      <div
+        className={`absolute -inset-[1px] rounded-2xl transition-opacity duration-500 ${
+          hovered || feature.highlight
+            ? "opacity-100"
+            : "opacity-0"
+        }`}
+        style={{
+          background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)), hsl(var(--secondary)))",
+        }}
+      />
+
+      {/* Card body */}
+      <div
+        className={`relative rounded-2xl p-8 transition-all duration-500 ${
+          hovered || feature.highlight
+            ? "bg-gradient-to-br from-primary/30 via-accent/20 to-secondary/20 -translate-y-2"
+            : "bg-card"
+        }`}
+      >
+        {/* Icon */}
+        <motion.div
+          animate={hovered ? { scale: 1.15, rotate: [0, -5, 5, 0] } : { scale: 1, rotate: 0 }}
+          transition={{ duration: 0.4 }}
+        >
+          <feature.icon className="w-12 h-12 text-primary mb-6" />
+        </motion.div>
+
+        {/* Title */}
+        <h3 className="font-display text-2xl font-bold mb-3 text-foreground">{feature.title}</h3>
+
+        {/* Description */}
+        <p className="text-muted-foreground font-body text-base leading-relaxed">{feature.desc}</p>
+
+        {/* Bottom glow line */}
+        <motion.div
+          className="absolute bottom-0 left-[10%] right-[10%] h-[2px] rounded-full"
+          style={{ background: "linear-gradient(90deg, transparent, hsl(var(--primary)), transparent)" }}
+          initial={{ scaleX: 0, opacity: 0 }}
+          animate={hovered ? { scaleX: 1, opacity: 1 } : { scaleX: 0, opacity: 0 }}
+          transition={{ duration: 0.4 }}
+        />
+      </div>
+    </motion.div>
+  );
+};
+
 const FeaturesSection = () => (
   <section id="features" className="py-24 px-6 max-w-7xl mx-auto relative z-10">
-    <h2 className="text-4xl md:text-5xl font-black text-center fire-gradient-text mb-4">POWERFUL FEATURES</h2>
-    <p className="text-center text-muted-foreground text-lg mb-16 max-w-2xl mx-auto font-body">
+    <motion.h2
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      className="text-4xl md:text-5xl font-black text-center fire-gradient-text mb-4"
+    >
+      POWERFUL FEATURES
+    </motion.h2>
+    <motion.p
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true }}
+      transition={{ delay: 0.2 }}
+      className="text-center text-muted-foreground text-lg mb-16 max-w-2xl mx-auto font-body"
+    >
       Everything you need for perfect meeting management
-    </p>
+    </motion.p>
 
-    <div className="grid md:grid-cols-3 gap-8">
+    <div className="grid md:grid-cols-3 gap-6">
       {features.map((f, i) => (
-        <motion.div
-          key={f.title}
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: i * 0.15, duration: 0.5 }}
-          className="bg-card p-8 rounded-2xl border-2 border-transparent hover:border-primary transition-all duration-500 hover:-translate-y-4 hover:shadow-[0_20px_60px_hsl(var(--primary)/0.4)] group cursor-pointer"
-        >
-          <f.icon className="w-14 h-14 text-primary mb-6 group-hover:scale-110 transition-transform" />
-          <h3 className="font-display text-2xl font-bold mb-3 text-foreground">{f.title}</h3>
-          <p className="text-muted-foreground font-body text-lg leading-relaxed">{f.desc}</p>
-        </motion.div>
+        <FeatureCard key={f.title} feature={f} index={i} />
       ))}
     </div>
   </section>
