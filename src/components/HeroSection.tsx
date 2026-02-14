@@ -1,10 +1,13 @@
 import { motion } from "framer-motion";
-import { Rocket, Play, CheckCircle } from "lucide-react";
+import { Rocket, Play, CheckCircle, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
 
 const highlights = ["Instant AI Analysis", "Smart Extraction", "100% Secure"];
 
 const HeroSection = () => {
+  const [demoHovered, setDemoHovered] = useState(false);
+
   const scrollTo = (href: string) => {
     document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
   };
@@ -41,13 +44,52 @@ const HeroSection = () => {
           >
             <Rocket className="w-5 h-5 mr-2" /> Try Now Free
           </Button>
-          <Button
-            size="lg"
-            variant="outline"
-            className="border-primary text-primary font-display uppercase tracking-wider text-lg px-8 py-6 hover:bg-primary/10 transition-colors"
+
+          {/* Animated Watch Demo button */}
+          <motion.div
+            className="relative"
+            onMouseEnter={() => setDemoHovered(true)}
+            onMouseLeave={() => setDemoHovered(false)}
           >
-            <Play className="w-5 h-5 mr-2" /> Watch Demo
-          </Button>
+            {/* Animated border */}
+            <motion.div
+              className="absolute -inset-[2px] rounded-lg overflow-hidden"
+              animate={demoHovered ? { opacity: 1 } : { opacity: 0.5 }}
+              transition={{ duration: 0.3 }}
+            >
+              <motion.div
+                className="absolute inset-0"
+                style={{
+                  background: "conic-gradient(from 0deg, hsl(var(--primary)), hsl(var(--accent)), hsl(var(--secondary)), hsl(var(--primary)))",
+                }}
+                animate={{ rotate: 360 }}
+                transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+              />
+            </motion.div>
+
+            <Button
+              size="lg"
+              variant="outline"
+              className="relative border-0 bg-background text-primary font-display uppercase tracking-wider text-lg px-8 py-6 hover:bg-primary/10 transition-colors"
+            >
+              <motion.span
+                animate={demoHovered ? { scale: [1, 1.2, 1] } : {}}
+                transition={{ duration: 0.5, repeat: Infinity }}
+              >
+                <Play className="w-5 h-5 mr-2" />
+              </motion.span>
+              Watch Demo
+              {demoHovered && (
+                <motion.span
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="ml-1"
+                >
+                  <Sparkles className="w-4 h-4 text-accent" />
+                </motion.span>
+              )}
+            </Button>
+          </motion.div>
         </div>
       </motion.div>
     </section>

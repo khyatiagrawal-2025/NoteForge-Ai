@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { Flame, Menu, X, LogIn, LogOut, User } from "lucide-react";
+import { useState, useCallback } from "react";
+import { Flame, Menu, X, LogIn, LogOut, User, Sparkles } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
@@ -14,10 +15,13 @@ const navLinks = [
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [sparkleTarget, setSparkleTarget] = useState<string | null>(null);
   const { user, signOut, loading } = useAuth();
   const navigate = useNavigate();
 
   const scrollTo = (href: string) => {
+    setSparkleTarget(href);
+    setTimeout(() => setSparkleTarget(null), 700);
     const el = document.querySelector(href);
     el?.scrollIntoView({ behavior: "smooth" });
     setMobileOpen(false);
@@ -38,9 +42,37 @@ const Navbar = () => {
             <button
               key={link.href}
               onClick={() => scrollTo(link.href)}
-              className="font-body font-semibold text-foreground hover:text-primary transition-colors relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-primary after:to-accent hover:after:w-full after:transition-all"
+              className="relative font-body font-semibold text-foreground hover:text-primary transition-colors after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-primary after:to-accent hover:after:w-full after:transition-all"
             >
               {link.label}
+              <AnimatePresence>
+                {sparkleTarget === link.href && (
+                  <>
+                    {[...Array(5)].map((_, i) => (
+                      <motion.span
+                        key={i}
+                        className="absolute w-1 h-1 rounded-full bg-primary pointer-events-none"
+                        initial={{ opacity: 1, scale: 0, x: 0, y: 0 }}
+                        animate={{
+                          opacity: [1, 1, 0],
+                          scale: [0, 1.5, 0],
+                          x: (Math.random() - 0.5) * 40,
+                          y: (Math.random() - 0.5) * 30,
+                        }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.6, delay: i * 0.08 }}
+                        style={{ left: "50%", top: "50%" }}
+                      />
+                    ))}
+                    <motion.div
+                      className="absolute inset-0 rounded-md"
+                      initial={{ opacity: 0, boxShadow: "0 0 0px hsl(var(--primary))" }}
+                      animate={{ opacity: [0, 0.6, 0], boxShadow: ["0 0 0px hsl(var(--primary))", "0 0 15px hsl(var(--primary))", "0 0 0px hsl(var(--primary))"] }}
+                      transition={{ duration: 0.6 }}
+                    />
+                  </>
+                )}
+              </AnimatePresence>
             </button>
           ))}
           {!loading && (

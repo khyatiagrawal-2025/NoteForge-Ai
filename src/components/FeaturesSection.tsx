@@ -12,7 +12,6 @@ const features = [
     icon: Brain,
     title: "AI Analysis",
     desc: "Advanced AI extracts action items, decisions, and insights automatically.",
-    highlight: true,
   },
   {
     icon: Shield,
@@ -52,9 +51,7 @@ const FeatureCard = ({ feature, index }: { feature: typeof features[0]; index: n
       {/* Outer glow border on hover */}
       <div
         className={`absolute -inset-[1px] rounded-2xl transition-opacity duration-500 ${
-          hovered || feature.highlight
-            ? "opacity-100"
-            : "opacity-0"
+          hovered ? "opacity-100" : "opacity-0"
         }`}
         style={{
           background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)), hsl(var(--secondary)))",
@@ -64,7 +61,7 @@ const FeatureCard = ({ feature, index }: { feature: typeof features[0]; index: n
       {/* Card body */}
       <div
         className={`relative rounded-2xl p-8 transition-all duration-500 ${
-          hovered || feature.highlight
+          hovered
             ? "bg-gradient-to-br from-primary/30 via-accent/20 to-secondary/20 -translate-y-2"
             : "bg-card"
         }`}
